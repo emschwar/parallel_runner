@@ -5,10 +5,10 @@ module ParallelRunner
   def self.each(object, concurency = 10, qsize = nil, &block)
     q = qsize ? SizedQueue.new(qsize) : Queue.new
     producer = Thread.start(q, concurency) do |pq, pc|
-      if object.instance_of? Array
-        object.each_with_index {|value, index| pq.enq([[value, index], true])}
-      elsif object.instance_of? Hash
+      if object.instance_of? Hash
         object.each {|key, value| pq.enq([[key, value], true])}
+      else
+        object.each_with_index {|value, index| pq.enq([[value, index], true])}
       end
       pc.times{pq.enq([nil, false])}
     end
@@ -27,13 +27,7 @@ module ParallelRunner
   end
 end
 
-class Hash
-  def each_parallel(concurency = 10, qsize = nil, &block)
-    ParallelRunner.each(self, concurency, qsize, &block)
-  end
-end
-
-class Array
+module Enumerable
   def each_parallel(concurency = 10, qsize = nil, &block)
     ParallelRunner.each(self, concurency, qsize, &block)
   end
