@@ -27,48 +27,52 @@ def map
   }
 end
 
+def get_agent
+  Mechanize.new.tap do |mechanize|
+    mechanize.agent.http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+  end
+end
+
 def time_by_each_parallel
-  agent = Mechanize.new
+  agent = get_agent
   exec_time {
     list.each_parallel do |url|
       site = agent.get(url)
-      html = site.root.xpath("//title")[0].inner_html
+      html = (site / "//title")[0].inner_html
       html.should_not be_nil
     end
   }
 end
 
 def time_by_each
-  agent = Mechanize.new
+  agent = get_agent
   exec_time {
     list.each do |url|
       site = agent.get(url)
-      html = site.root.xpath("//title")[0].inner_html
+      html = (site / "//title")[0].inner_html
       html.should_not be_nil
     end
   }
 end
 
 def time_by_each_with_index
-  agent = Mechanize.new
+  agent = get_agent
   exec_time {
     list.each_with_index do |url, index|
       site = agent.get(url)
-      html = site.root.xpath("//title")[0].inner_html
+      html = (site / "//title")[0].inner_html
       html.should_not be_nil
     end
   }
 end
 
 def time_by_each_by_map
-  agent = Mechanize.new
+  agent = get_agent
   exec_time {
     map.each do |name, url|
       site = agent.get(url)
-      html = site.root.xpath("//title")[0].inner_html
+      html = (site / "//title")[0].inner_html
       html.should_not be_nil
     end
   }
 end
-
-
